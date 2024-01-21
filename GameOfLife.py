@@ -7,9 +7,12 @@ class GameOfLife:
     rows:int
     cols:int
 
-    def __init__(self, rows:int, cols:int):
+    num_of_generations:int
+
+    def __init__(self, rows:int, cols:int, num_of_generations):
         self.rows = rows
         self.cols = cols
+        self.num_of_generations = num_of_generations
 
     def get_index(self, index:int) -> tuple[int, int]:
         row = int(floor(index / self.cols))
@@ -19,11 +22,11 @@ class GameOfLife:
 
     # Simulates the game of life for a set amount of generations.
     # Returns a tuple consisting of life span, max size, and is infinite
-    def simulate(self, start:Chromosome, num_of_generations:int):
-        if len(start.representation) == start.representation.count('0'):
+    def simulate(self, start:Chromosome.representation):
+        if len(start) == start.count('0'):
             return 0, 0, INFINITY_TABLE.NO
 
-        if self.rows * self.cols != len(start.representation):
+        if self.rows * self.cols != len(start):
             raise ValueError("Invalid number of bits in representation")
 
         lifespan:int = 0
@@ -31,17 +34,14 @@ class GameOfLife:
         is_infinite:INFINITY_TABLE = INFINITY_TABLE.UNKNOWN
 
         lookup_table = set()
-        lookup_table.add(start.representation)
+        lookup_table.add(start)
 
         def initialize_array():
             array = [[0 for _ in range(self.cols)] for _ in range(self.rows)]
 
-            for i in range(len(start.representation)):
-                if not start.representation[i]:
-                    continue
-
-                row, col = self.get_index(i)
-                array[row][col] = 1
+            for t in range(len(start)):
+                row, col = self.get_index(t)
+                array[row][col] = start[t]
 
             return array
 
@@ -82,7 +82,7 @@ class GameOfLife:
                             result[r][c] = 1
             return repr_string, result
 
-        for i in range(num_of_generations):
+        for i in range(self.num_of_generations):
             lifespan += 1
             next_representation_string, next_table = advance()
 
