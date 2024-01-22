@@ -42,7 +42,7 @@ class genetic_algorithm:
 
         return representation
 
-    def create_random_population(self):
+    def create_random_population(self) -> list[Chromosome]:
         population = []
         s = set()
 
@@ -59,11 +59,12 @@ class genetic_algorithm:
 
         return population
 
-    def run(self):
+    def run(self) -> Chromosome:
         population = self.create_random_population() # Create random population
-        next_population = []
 
         for i in range(self.num_of_generations):
+            next_population = []
+
             while len(next_population) < self.population_size:
                 # pick 2 parents by roulette
                 parent1 = pick_parent
@@ -88,6 +89,9 @@ class genetic_algorithm:
                         offspring_representation += temp_offspring_representation[j]
 
 
-            offspring = create_chromosome_from_representation(offspring_representation)
+                offspring:Chromosome = self.game_of_life_instance.simulate(offspring_representation)
+                next_population.append(offspring)
 
+            population = next_population
 
+        return max(population, key=lambda x: x.fitness)
