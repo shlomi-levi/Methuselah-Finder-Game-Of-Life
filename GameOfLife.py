@@ -21,10 +21,12 @@ class GameOfLife:
         return row, col
 
     # Simulates the game of life for a set amount of generations.
-    # Returns a tuple consisting of life span, max size, and is infinite
-    def simulate(self, start:Chromosome.representation):
-        if len(start) == start.count('0'):
-            return 0, 0, INFINITY_TABLE.NO
+    # Returns a chromosome instance
+    def simulate(self, start:Chromosome.representation) -> Chromosome:
+        length = len(start)
+
+        if length == start.count('0'):
+            return Chromosome(length, start, 0, 0, INFINITY_TABLE.NO)
 
         if self.rows * self.cols != len(start):
             raise ValueError("Invalid number of bits in representation")
@@ -98,4 +100,4 @@ class GameOfLife:
 
             max_size = max(max_size, next_representation_string.count('1'))
 
-        return lifespan, max_size, is_infinite
+        return Chromosome(length, start, lifespan, max_size, is_infinite)
