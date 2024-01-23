@@ -20,7 +20,7 @@ class GameOfLife:
 
         return row, col
 
-    # Simulates the game of life for a set amount of generations.
+    # Simulates the game of life for a starting representation for a set amount of generations.
     # Returns a chromosome instance
     def simulate(self, start:Chromosome.representation) -> Chromosome:
         length = len(start)

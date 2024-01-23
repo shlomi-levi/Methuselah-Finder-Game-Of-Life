@@ -1,6 +1,7 @@
 from GameOfLife import GameOfLife
 from Chromosome import Chromosome
 from random import uniform
+from Roulette import Roulette
 
 class genetic_algorithm:
     alive_chance_in_initialization:float
@@ -59,21 +60,26 @@ class genetic_algorithm:
 
         return population
 
+
     def run(self) -> Chromosome:
-        population = self.create_random_population() # Create random population
+        population:list[Chromosome] = self.create_random_population() # Create random population
 
         for i in range(self.num_of_generations):
+            r:Roulette = Roulette(population, genetic_algorithm.calculate_fitness)
             next_population = []
 
             while len(next_population) < self.population_size:
+                if r.size() < 2:
+                    r = Roulette(population, genetic_algorithm.calculate_fitness)
+
                 # pick 2 parents by roulette
-                parent1 = pick_parent
-                parent2 = pick_parent
+                parent1 = r.get()
+                parent2 = r.get()
 
                 crossover_chance = uniform(0, 1)
                 if crossover_chance > self.crossover_chance:
-                    next_population.add(parent1)
-                    next_population.add(parent2)
+                    next_population.append(parent1)
+                    next_population.append(parent2)
                     continue
 
                 temp_offspring_representation:str = crossover(parent1, parent2)
