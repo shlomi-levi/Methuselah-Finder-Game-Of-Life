@@ -1,5 +1,6 @@
 from GameOfLife import GameOfLife
 from Chromosome import Chromosome
+from typing import Callable
 from random import uniform
 from Roulette import Roulette
 
@@ -11,22 +12,15 @@ class genetic_algorithm:
 
     game_of_life_instance:GameOfLife
 
-    def __init__(self, alive_chance_in_initialization:float, mutation_chance:float, crossover_chance:float, population_size:int, num_of_generations:int, game_of_life_instance:GameOfLife):
+    def __init__(self, alive_chance_in_initialization:float, mutation_chance:float, crossover_chance:float, crossover_function:Callable[[Chromosome, Chromosome], Chromosome.representation], population_size:int, num_of_generations:int, game_of_life_instance:GameOfLife, fitness_function:Callable[[Chromosome], float]):
         self.alive_chance_in_initialization = alive_chance_in_initialization
         self.mutation_chance = mutation_chance
         self.crossover_chance = crossover_chance
+        self.crossover_function = crossover_function
         self.population_size = population_size
         self.game_of_life_instance = game_of_life_instance
         self.num_of_generations = num_of_generations
-
-    @staticmethod
-    def calculate_fitness(c:Chromosome):
-        return c.lifespan + c.max_size
-
-    @staticmethod
-    def crossover(c1:Chromosome, c2:Chromosome) -> Chromosome.representation:
-        # TODO: Change this
-        pass
+        self.fitness_function = fitness_function
 
     def create_random_chromosome_representation(self) -> str:
         representation = ''
@@ -65,16 +59,16 @@ class genetic_algorithm:
         population:list[Chromosome] = self.create_random_population() # Create random population
 
         for i in range(self.num_of_generations):
-            r:Roulette = Roulette(population, genetic_algorithm.calculate_fitness)
+            r:Roulette = Roulette(population, self.fitness_function)
             next_population = []
 
             while len(next_population) < self.population_size:
                 if r.size() < 2:
-                    r = Roulette(population, genetic_algorithm.calculate_fitness)
+                    r = Roulette(population, self.fitness_function)
 
                 # pick 2 parents by roulette
-                parent1 = r.get()
-                parent2 = r.get()
+                parent1:Chromosome = r.get()
+                parent2:Chromosome = r.get()
 
                 crossover_chance = uniform(0, 1)
                 if crossover_chance > self.crossover_chance:
@@ -82,7 +76,7 @@ class genetic_algorithm:
                     next_population.append(parent2)
                     continue
 
-                temp_offspring_representation:str = crossover(parent1, parent2)
+                temp_offspring_representation:str = self.crossover_function(parent1, parent2)
                 offspring_representation = ''
 
                 for j in range(len(temp_offspring_representation)):
@@ -100,4 +94,4 @@ class genetic_algorithm:
 
             population = next_population
 
-        return max(population, key=lambda x: x.fitness)
+        return max(population, key=lambda x: self.fitness_function(x))
