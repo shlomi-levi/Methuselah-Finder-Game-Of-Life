@@ -61,6 +61,16 @@ class GameOfLife:
 
         return repr_string, result
 
+    # Initializes the table for the game of life
+    def initialize_array(self, start:str):
+        array = [[0 for _ in range(self.cols)] for _ in range(self.rows)]
+
+        for t in range(len(start)):
+            row, col = self.get_index(t)
+            array[row][col] = int(start[t])
+
+        return array
+
     # Simulates the game of life for a starting representation for a set amount of generations.
     # Returns a chromosome instance
     def simulate(self, start:str) -> Chromosome:
@@ -81,16 +91,7 @@ class GameOfLife:
         lookup_table = set()
         lookup_table.add(start)
 
-        def initialize_array():
-            array = [[0 for _ in range(self.cols)] for _ in range(self.rows)]
-
-            for t in range(len(start)):
-                row, col = self.get_index(t)
-                array[row][col] = int(start[t])
-
-            return array
-
-        table = initialize_array()
+        table = self.initialize_array(start)
 
         for i in range(self.num_of_generations):
             lifespan += 1
