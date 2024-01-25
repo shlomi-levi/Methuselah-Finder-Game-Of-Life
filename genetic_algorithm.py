@@ -42,6 +42,7 @@ class genetic_algorithm:
         s = set()
 
         for i in range(self.population_size):
+            print(i)
             random_representation = self.create_random_chromosome_representation()
 
             while random_representation in s:
@@ -57,8 +58,8 @@ class genetic_algorithm:
 
     def run(self) -> Chromosome:
         population:list[Chromosome] = self.create_random_population() # Create random population
-
         for i in range(self.num_of_generations):
+            print("Entering ", i, " iteration of genetic algorithm")
             r:Roulette = Roulette(population, self.fitness_function)
             next_population = []
 
@@ -71,8 +72,13 @@ class genetic_algorithm:
                 parent2:Chromosome = r.get()
 
                 crossover_chance = uniform(0, 1)
+
                 if crossover_chance > self.crossover_chance:
                     next_population.append(parent1)
+
+                    if len(next_population) == self.population_size:
+                        break
+
                     next_population.append(parent2)
                     continue
 

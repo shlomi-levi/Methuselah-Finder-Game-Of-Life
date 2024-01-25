@@ -3,6 +3,9 @@ from Chromosome import INFINITY_TABLE
 from math import floor
 import copy
 
+ALIVE=1
+DEAD=0
+
 class GameOfLife:
     rows:int
     cols:int
@@ -21,7 +24,7 @@ class GameOfLife:
         return row, col
 
     # Advance one step in the game of life
-    def advance(self, table:list[list[str]]) -> tuple[str, list[list[str]]]:
+    def advance(self, table:list[list[int]]) -> tuple[str, list[list[int]]]:
         def count_alive_neighbors(row, col):
             alive = 0
 
@@ -31,7 +34,7 @@ class GameOfLife:
 
             for x, y in positions:
                 if 0 <= x < self.rows and 0 <= y < self.cols:
-                    if table[x][y] == '1':
+                    if table[x][y] == ALIVE:
                         alive += 1
 
             return alive
@@ -43,15 +46,18 @@ class GameOfLife:
             for c in range(self.cols):
                 alive_neighbors = count_alive_neighbors(r, c)
 
-                if table[r][c] == '1':
+                if table[r][c] == ALIVE:
                     if alive_neighbors < 2 or alive_neighbors > 3:
-                        result[r][c] = '0'
+                        result[r][c] = DEAD
 
-                elif table[r][c] == '0':
+                elif table[r][c] == DEAD:
                     if alive_neighbors == 3:
-                        result[r][c] = '1'
+                        result[r][c] = ALIVE
 
-                repr_string += result[r][c]
+                repr_string += str(result[r][c])
+
+        if repr_string.count('0') == len(repr_string):
+            return None, result # type:ignore
 
         return repr_string, result
 
@@ -61,24 +67,26 @@ class GameOfLife:
         length = len(start)
 
         if length == start.count('0'):
-            return Chromosome(length, start, 0, 0, INFINITY_TABLE.NO)
+            return Chromosome(length, start, 0, 0, 0, INFINITY_TABLE.NO)
+
+        initial_size:int = start.count('1')
 
         if self.rows * self.cols != len(start):
             raise ValueError("Invalid number of bits in representation")
 
         lifespan:int = 0
-        max_size:int = start.count('1')
+        max_size:int = initial_size
         is_infinite:INFINITY_TABLE = INFINITY_TABLE.UNKNOWN
 
         lookup_table = set()
         lookup_table.add(start)
 
         def initialize_array():
-            array = [['0' for _ in range(self.cols)] for _ in range(self.rows)]
+            array = [[0 for _ in range(self.cols)] for _ in range(self.rows)]
 
             for t in range(len(start)):
                 row, col = self.get_index(t)
-                array[row][col] = start[t]
+                array[row][col] = int(start[t])
 
             return array
 
@@ -88,16 +96,17 @@ class GameOfLife:
             lifespan += 1
             next_representation_string, next_table = self.advance(table)
 
-            if next_representation_string in lookup_table:
-                is_infinite = INFINITY_TABLE.YES
+            if not next_representation_string:
+                print("DIES")
+                is_infinite = INFINITY_TABLE.NO
                 break
 
-            if not next_representation_string:
-                is_infinite = INFINITY_TABLE.NO
+            if next_representation_string in lookup_table:
+                is_infinite = INFINITY_TABLE.YES
                 break
 
             table = next_table
 
             max_size = max(max_size, next_representation_string.count('1'))
 
-        return Chromosome(length, start, lifespan, max_size, is_infinite)
+        return Chromosome(length, start, lifespan, initial_size, max_size, is_infinite)
