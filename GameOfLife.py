@@ -44,17 +44,15 @@ class GameOfLife:
                 alive_neighbors = count_alive_neighbors(r, c)
 
                 if table[r][c] == '1':
-                    repr_string += '1'
-
                     if alive_neighbors < 2 or alive_neighbors > 3:
                         result[r][c] = '0'
 
                 elif table[r][c] == '0':
-                    repr_string += '0'
-
                     if alive_neighbors == 3:
                         result[r][c] = '1'
-                        
+
+                repr_string += result[r][c]
+
         return repr_string, result
 
     # Simulates the game of life for a starting representation for a set amount of generations.
@@ -76,7 +74,7 @@ class GameOfLife:
         lookup_table.add(start)
 
         def initialize_array():
-            array = [[0 for _ in range(self.cols)] for _ in range(self.rows)]
+            array = [['0' for _ in range(self.cols)] for _ in range(self.rows)]
 
             for t in range(len(start)):
                 row, col = self.get_index(t)
@@ -85,8 +83,6 @@ class GameOfLife:
             return array
 
         table = initialize_array()
-
-
 
         for i in range(self.num_of_generations):
             lifespan += 1
