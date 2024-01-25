@@ -12,7 +12,7 @@ class genetic_algorithm:
 
     game_of_life_instance:GameOfLife
 
-    def __init__(self, alive_chance_in_initialization:float, mutation_chance:float, crossover_chance:float, crossover_function:Callable[[Chromosome, Chromosome], Chromosome.representation], population_size:int, num_of_generations:int, game_of_life_instance:GameOfLife, fitness_function:Callable[[Chromosome], float]):
+    def __init__(self, alive_chance_in_initialization:float, mutation_chance:float, crossover_chance:float, crossover_function:Callable[[Chromosome, Chromosome], str], population_size:int, num_of_generations:int, game_of_life_instance:GameOfLife, fitness_function:Callable[[Chromosome], float]):
         self.alive_chance_in_initialization = alive_chance_in_initialization
         self.mutation_chance = mutation_chance
         self.crossover_chance = crossover_chance

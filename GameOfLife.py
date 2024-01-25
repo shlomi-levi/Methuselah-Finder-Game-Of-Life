@@ -20,9 +20,46 @@ class GameOfLife:
 
         return row, col
 
+    # Advance one step in the game of life
+    def advance(self, table:list[list[str]]) -> tuple[str, list[list[str]]]:
+        def count_alive_neighbors(row, col):
+            alive = 0
+
+            positions = [ (row - 1, col - 1), (row - 1, col), (row - 1, col + 1),
+                          (row, col - 1), (row, col + 1),
+                          (row + 1, col - 1), (row + 1, col), (row + 1, col + 1) ]
+
+            for x, y in positions:
+                if 0 <= x < self.rows and 0 <= y < self.cols:
+                    if table[x][y] == '1':
+                        alive += 1
+
+            return alive
+
+        result = copy.copy(table)
+        repr_string = ''
+
+        for r in range(self.rows):
+            for c in range(self.cols):
+                alive_neighbors = count_alive_neighbors(r, c)
+
+                if table[r][c] == '1':
+                    repr_string += '1'
+
+                    if alive_neighbors < 2 or alive_neighbors > 3:
+                        result[r][c] = '0'
+
+                elif table[r][c] == '0':
+                    repr_string += '0'
+
+                    if alive_neighbors == 3:
+                        result[r][c] = '1'
+                        
+        return repr_string, result
+
     # Simulates the game of life for a starting representation for a set amount of generations.
     # Returns a chromosome instance
-    def simulate(self, start:Chromosome.representation) -> Chromosome:
+    def simulate(self, start:str) -> Chromosome:
         length = len(start)
 
         if length == start.count('0'):
@@ -32,7 +69,7 @@ class GameOfLife:
             raise ValueError("Invalid number of bits in representation")
 
         lifespan:int = 0
-        max_size:int = start.representation.count('1')
+        max_size:int = start.count('1')
         is_infinite:INFINITY_TABLE = INFINITY_TABLE.UNKNOWN
 
         lookup_table = set()
@@ -49,44 +86,11 @@ class GameOfLife:
 
         table = initialize_array()
 
-        def advance() -> tuple[str, list[list[int]]]:
-            def count_alive_neighbors(row, col):
-                alive = 0
 
-                positions = [ (row - 1, col - 1), (row - 1, col), (row - 1, col + 1),
-                              (row, col - 1), (row, col + 1),
-                              (row + 1, col - 1), (row + 1, col), (row + 1, col + 1) ]
-
-                for x, y in positions:
-                    if 0 <= x < self.rows and 0 <= y < self.cols:
-                        if table[x][y] == '1':
-                            alive += 1
-
-                return alive
-
-            result = copy.copy(table)
-            repr_string = ''
-
-            for r in range(self.rows):
-                for c in range(self.cols):
-                    alive_neighbors = count_alive_neighbors(r, c)
-
-                    if table[r][c] == 1:
-                        repr_string += '1'
-
-                        if alive_neighbors < 2 or alive_neighbors > 3:
-                            result[r][c] = 0
-
-                    elif table[r][c] == 0:
-                        repr_string += '0'
-
-                        if alive_neighbors == 3:
-                            result[r][c] = 1
-            return repr_string, result
 
         for i in range(self.num_of_generations):
             lifespan += 1
-            next_representation_string, next_table = advance()
+            next_representation_string, next_table = self.advance(table)
 
             if next_representation_string in lookup_table:
                 is_infinite = INFINITY_TABLE.YES

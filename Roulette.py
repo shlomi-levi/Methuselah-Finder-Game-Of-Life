@@ -1,5 +1,6 @@
 from Chromosome import Chromosome
 from random import uniform
+from copy import deepcopy
 
 class Roulette:
     __probabilities_list__:list[float]
@@ -18,9 +19,9 @@ class Roulette:
 
             self.__probabilities_list__.append(last_probability)
 
-    def size(self):
+    def size(self) -> int:
         return len(self.__participants__)
-    def is_empty(self):
+    def is_empty(self) -> bool:
         return len(self.__participants__) == 0
 
     def get(self) -> Chromosome:
@@ -46,7 +47,7 @@ class Roulette:
 
 
     def __init__(self, participants:list[Chromosome], fitness_function):
-        self.__participants__ = participants
+        self.__participants__ = deepcopy(participants)
         self.__fitness_function__ = fitness_function
 
         fitness_list = [self.__fitness_function__(x) for x in self.__participants__]
