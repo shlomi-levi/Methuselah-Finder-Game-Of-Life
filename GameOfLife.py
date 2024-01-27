@@ -1,113 +1,92 @@
-from Chromosome import Chromosome
-from Chromosome import INFINITY_TABLE
-from math import floor
+from Chromosome import Chromosome, INFINITY_TABLE, Chromosome_Representation
 import copy
 
-ALIVE=1
-DEAD=0
+ALIVE = 1
+DEAD = 0
 
-class GameOfLife:
-    rows:int
-    cols:int
+def count_alive_neighbors(alive_dict:set[tuple[int,int]], row:int, col:int) -> int:
+    alive = 0
 
-    num_of_generations:int
+    positions = [(row - 1, col - 1), (row - 1, col), (row - 1, col + 1),
+                 (row, col - 1), (row, col + 1),
+                 (row + 1, col - 1), (row + 1, col), (row + 1, col + 1)]
 
-    def __init__(self, rows:int, cols:int, num_of_generations):
-        self.rows = rows
-        self.cols = cols
-        self.num_of_generations = num_of_generations
+    for pos in positions:
+        if pos in alive_dict:
+            alive += 1
 
-    def get_index(self, index:int) -> tuple[int, int]:
-        row = int(floor(index / self.cols))
-        col = index % self.cols
+    return alive
 
-        return row, col
+def get_dead_neighbors(alive_dict:set[tuple[int,int]], row:int, col:int) -> list[tuple[int,int]]:
+    result = []
 
-    # Advance one step in the game of life
-    def advance(self, table:list[list[int]]) -> tuple[str, list[list[int]]]:
-        def count_alive_neighbors(row, col):
-            alive = 0
+    positions = [ (row - 1, col - 1), (row - 1, col), (row - 1, col + 1),
+                 (row, col - 1), (row, col + 1),
+                 (row + 1, col - 1), (row + 1, col), (row + 1, col + 1) ]
 
-            positions = [ (row - 1, col - 1), (row - 1, col), (row - 1, col + 1),
-                          (row, col - 1), (row, col + 1),
-                          (row + 1, col - 1), (row + 1, col), (row + 1, col + 1) ]
+    for pos in positions:
+        if pos not in alive_dict:
+            result.append(pos)
 
-            for x, y in positions:
-                if 0 <= x < self.rows and 0 <= y < self.cols:
-                    if table[x][y] == ALIVE:
-                        alive += 1
+    return result
 
-            return alive
+# Simulates the game of life for a starting representation for a set amount of generations.
+# Returns a chromosome instance
+def simulate(start:Chromosome_Representation) -> Chromosome:
+    representation = start.get()
 
-        result = copy.copy(table)
-        repr_string = ''
+    if not representation:
+        return Chromosome(start, 0, 0, 0, INFINITY_TABLE.NO)
 
-        for r in range(self.rows):
-            for c in range(self.cols):
-                alive_neighbors = count_alive_neighbors(r, c)
+    initial_size:int = len(representation)
 
-                if table[r][c] == ALIVE:
-                    if alive_neighbors < 2 or alive_neighbors > 3:
-                        result[r][c] = DEAD
+    lifespan:int = 0
+    max_size:int = initial_size
+    is_infinite:INFINITY_TABLE = INFINITY_TABLE.UNKNOWN
 
-                elif table[r][c] == DEAD:
-                    if alive_neighbors == 3:
-                        result[r][c] = ALIVE
+    lookup_table = set()
 
-                repr_string += str(result[r][c])
+    current_representation:Chromosome_Representation = start
 
-        if repr_string.count('0') == len(repr_string):
-            return None, result # type:ignore
+    current_iteration_set = copy.deepcopy(representation) # alive set
+    next_iteration_set = copy.deepcopy(current_iteration_set)
 
-        return repr_string, result
+    while current_iteration_set and current_representation not in lookup_table:
+        lookup_table.add(current_representation)
 
-    # Initializes the table for the game of life
-    def initialize_array(self, start:str):
-        array = [[0 for _ in range(self.cols)] for _ in range(self.rows)]
+        lifespan += 1
 
-        for t in range(len(start)):
-            row, col = self.get_index(t)
-            array[row][col] = int(start[t])
+        relevant_dead_cells:set[tuple[int,int]] = set()
 
-        return array
+        for alive_member_current_iteration in current_iteration_set: # Iterate through alive cells
+            row, col = alive_member_current_iteration
 
-    # Simulates the game of life for a starting representation for a set amount of generations.
-    # Returns a chromosome instance
-    def simulate(self, start:str) -> Chromosome:
-        length = len(start)
+            for dead_cell in get_dead_neighbors(current_iteration_set, row, col): # add relevant dead neighbor cells
+                relevant_dead_cells.add(dead_cell)
 
-        if length == start.count('0'):
-            return Chromosome(length, start, 0, 0, 0, INFINITY_TABLE.NO)
+            alive_neighbors_count = count_alive_neighbors(current_iteration_set, row, col)
 
-        initial_size:int = start.count('1')
+            if alive_neighbors_count < 2 or alive_neighbors_count > 3:
+                next_iteration_set.remove(alive_member_current_iteration)
 
-        if self.rows * self.cols != len(start):
-            raise ValueError("Invalid number of bits in representation")
+        for relevant_dead_cell_current_iteration in relevant_dead_cells:
+            row, col = relevant_dead_cell_current_iteration
+            alive_neighbors_count = count_alive_neighbors(current_iteration_set, row, col)
 
-        lifespan:int = 0
-        max_size:int = initial_size
-        is_infinite:INFINITY_TABLE = INFINITY_TABLE.UNKNOWN
+            if alive_neighbors_count == 3:
+                next_iteration_set.add(relevant_dead_cell_current_iteration)
 
-        lookup_table = set()
-        lookup_table.add(start)
+        max_size = max(max_size, len(next_iteration_set))
 
-        table = self.initialize_array(start)
+        current_iteration_set = copy.deepcopy(next_iteration_set)
 
-        for i in range(self.num_of_generations):
-            lifespan += 1
-            next_representation_string, next_table = self.advance(table)
+        current_representation = Chromosome_Representation(next_iteration_set)
 
-            if not next_representation_string:
-                print("DIES")
-                is_infinite = INFINITY_TABLE.NO
-                break
+    if current_representation in lookup_table:
+        is_infinite = INFINITY_TABLE.YES
 
-            if next_representation_string in lookup_table:
-                is_infinite = INFINITY_TABLE.YES
-                break
+    else:
+        is_infinite = INFINITY_TABLE.NO
 
-            table = next_table
+    return Chromosome(start, lifespan, initial_size, max_size, is_infinite)
 
-            max_size = max(max_size, next_representation_string.count('1'))
-
-        return Chromosome(length, start, lifespan, initial_size, max_size, is_infinite)
