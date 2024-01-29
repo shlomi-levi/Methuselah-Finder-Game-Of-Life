@@ -12,6 +12,13 @@ class Chromosome_Representation:
     def get(self):
         return self.representation
 
+    def get_members(self):
+        members = []
+        for alive_location in self.representation:
+            members.append(alive_location)
+
+        return members
+
     def __init__(self, representation:set[tuple[int, int]]):
         self.representation = representation
         self.hash_string = self.get_hash_string()
@@ -19,9 +26,7 @@ class Chromosome_Representation:
     def get_hash_string(self):
         ret = ''
 
-        members = []
-        for alive_location in self.representation:
-            members.append(alive_location)
+        members = self.get_members()
 
         members.sort(key=lambda x:x[0])
 
@@ -50,11 +55,12 @@ class Chromosome_Representation:
     def create_random_representation(bounding_square:int, alive_chance:float):
         representation: set[tuple[int, int]] = set()
 
-        for i in range(bounding_square):
-            for j in range(bounding_square):
-                r = uniform(0, 1)
-                if r <= alive_chance:
-                    representation.add((i, j))
+        while not representation:
+            for i in range(bounding_square):
+                for j in range(bounding_square):
+                    r = uniform(0, 1)
+                    if r <= alive_chance:
+                        representation.add((i, j))
 
         return Chromosome_Representation(representation)
 
