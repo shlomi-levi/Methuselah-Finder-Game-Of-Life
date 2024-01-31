@@ -1,7 +1,6 @@
 from Chromosome import Chromosome, INFINITY_TABLE, Chromosome_Representation
 
-# TODO: Refactor simulate
-
+# Counts and returns the number of neighbors that are alive, relative to the cell in (row, col)
 def count_alive_neighbors(alive_dict:set[tuple[int,int]], row:int, col:int, border:int) -> int:
     alive = 0
 
@@ -21,6 +20,7 @@ def count_alive_neighbors(alive_dict:set[tuple[int,int]], row:int, col:int, bord
 
     return alive
 
+# Returns a list consisting of all the dead neighbors that the cel in (row, col) has.
 def get_dead_neighbors(alive_set, row:int, col:int, border:int) -> list[tuple[int,int]]:
     result = []
 
@@ -29,10 +29,10 @@ def get_dead_neighbors(alive_set, row:int, col:int, border:int) -> list[tuple[in
                  (row + 1, col - 1), (row + 1, col), (row + 1, col + 1) ]
 
     for pos in positions:
-        if not ( -abs(border) <= pos[0] <= abs(border) ):
+        if not ( -abs(border) <= pos[0] <= abs(border) ): # If we are out of the border (horizontally wise), continue
             continue
 
-        if not ( -abs(border) <= pos[1] <= abs(border) ):
+        if not ( -abs(border) <= pos[1] <= abs(border) ): # If we are out of the border (vertically wise), continue
             continue
 
         if pos not in alive_set:
@@ -40,12 +40,12 @@ def get_dead_neighbors(alive_set, row:int, col:int, border:int) -> list[tuple[in
 
     return result
 
-# Simulates the game of life for a starting representation for a set amount of generations.
+# Simulates the game of life for a starting configuration.
 # Returns a chromosome instance
 def simulate(start:Chromosome_Representation, border:int) -> Chromosome:
-    representation = start.get()
+    representation = start.get() # Get the frozen set that consists of living cells
 
-    if not representation:
+    if not representation: # If there are no living cells
         return Chromosome(start, 0, 0, 0, INFINITY_TABLE.NO)
 
     initial_size:int = len(representation)
@@ -71,7 +71,7 @@ def simulate(start:Chromosome_Representation, border:int) -> Chromosome:
         for alive_cell in current_iteration_set: # Iterate through alive cells
             row, col = alive_cell
 
-            relevant_dead_cells.update(get_dead_neighbors(current_iteration_set, row, col, border)) # add relevant dead neighbor cells
+            relevant_dead_cells.update(get_dead_neighbors(current_iteration_set, row, col, border)) # Add relevant dead neighbor cells
 
             alive_neighbors_count = count_alive_neighbors(current_iteration_set, row, col, border)
 
@@ -80,10 +80,10 @@ def simulate(start:Chromosome_Representation, border:int) -> Chromosome:
 
         for dead_cell in relevant_dead_cells: # Iterate through dead cells
             row, col = dead_cell
-            alive_neighbors_count = count_alive_neighbors(current_iteration_set, row, col, border)
+            alive_neighbors_count = count_alive_neighbors(current_iteration_set, row, col, border) # Get count of living cells that the current dead cell has
 
             if alive_neighbors_count == 3:
-                next_iteration_set.add(dead_cell)
+                next_iteration_set.add(dead_cell) # If the current dead cell has exactly 3 living neighbors, resucitate it
 
         max_size = max(max_size, len(next_iteration_set))
 

@@ -52,7 +52,6 @@ class Chromosome_Representation:
 
 class Chromosome:
     representation:Chromosome_Representation
-    hash_string:str
     lifespan:int
     initial_size:int
     max_size:int
@@ -75,4 +74,4 @@ class Chromosome:
         return self.representation.__eq__(other.representation)
 
     def __str__(self):
-        return f"Initial size: {self.initial_size} Lifespan: {self.lifespan} Max Size: {self.max_size} {self.representation.get()}"
+        return f"Initial size: {self.initial_size} Lifespan: {self.lifespan} Max Size: {self.max_size}"

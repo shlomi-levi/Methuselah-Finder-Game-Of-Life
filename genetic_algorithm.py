@@ -8,10 +8,12 @@ import pickle
 
 INITIAL_CONFIGURATION_SQUARE_SIZE = 8
 
+# Updates the result file with the best result found yet
 def update_result_file(result_file, data:frozenset[tuple[int,int]]):
     with open(result_file, 'wb') as file:
         pickle.dump(data, file)
 
+# Updates the average evaluation file with the current average evaluation array
 def update_average_evaluation_file(avg_eval_file, data:list[float]):
     with open(avg_eval_file, 'wb') as file:
         pickle.dump(data, file)

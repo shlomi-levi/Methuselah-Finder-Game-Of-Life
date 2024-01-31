@@ -1,7 +1,7 @@
 """
-Conway's Game Of Life With Tkinter In Python
-See https://www.hashbangcode.com/article/conways-game-life-tkinter-python for
-a detailed breakdown of this code.
+Conway's Game Of Life implementation in Python
+I took the original source code from here: https://www.hashbangcode.com/article/conways-game-life-tkinter-python
+and edited it to fit my needs
 """
 
 import tkinter as tk
@@ -125,9 +125,11 @@ def main():
     window_size = 800
     rows_and_columns = 100
 
+    # Load the best result we got the last time we ran our genetic algorithm
     with open(RESULT_FILE, 'rb') as file:
         members = pickle.load(file)
 
+    # Center the living cells in the middle of the board
     members_list = list(members)
 
     max_x = max(members_list, key=lambda pos:pos[0])[0]
@@ -135,12 +137,12 @@ def main():
 
     half = int(floor(rows_and_columns/2))
 
-    x_offset = half - max_x
-    y_offset = half - max_y
+    x_offset = half - max_x # Offset for x values
+    y_offset = half - max_y # Offset for y values
 
-    table = [ [0 for _ in range(rows_and_columns)] for _ in range(rows_and_columns)]
+    table = [ [0 for _ in range(rows_and_columns)] for _ in range(rows_and_columns)] # Create the table representing the cells
 
-    for alive_cell in members_list:
+    for alive_cell in members_list: # Add living cells, with the appropriate offsets to each coordinate
         x, y = alive_cell
 
         x += x_offset
