@@ -5,13 +5,14 @@ a detailed breakdown of this code.
 """
 
 import tkinter as tk
+import pickle
+from math import floor
 from tkinter import Canvas
-import random
-from copy import deepcopy
+from main import RESULT_FILE
 
 class game_of_life(tk.Tk):
 
-    def __init__(self, table:list[list[int]], width_and_height=400, resolution=100):
+    def __init__(self, table:list[list[int]], width_and_height=800, resolution=100):
         super().__init__()
 
         self.title("Game of life")
@@ -32,12 +33,12 @@ class game_of_life(tk.Tk):
         self.canvas.pack()
 
         # Set up an empty game grid.
-        self.grid = deepcopy(table)
+        self.grid = table
 
         # Fill the game grid with random data.
-        for x in range(0, self.resolution):
-            for y in range(0, self.resolution):
-                self.grid[x][y] = random.randint(0, 1)
+        # for x in range(0, self.resolution):
+        #     for y in range(0, self.resolution):
+        #         self.grid[x][y] = random.randint(0, 1)
 
                 # Genearte the game board.
         self.generate_board()
@@ -117,3 +118,39 @@ class game_of_life(tk.Tk):
                 except IndexError:
                     continue
         return count
+
+def main():
+    members:frozenset
+
+    window_size = 800
+    rows_and_columns = 100
+
+    with open(RESULT_FILE, 'rb') as file:
+        members = pickle.load(file)
+
+    members_list = list(members)
+
+    max_x = max(members_list, key=lambda pos:pos[0])[0]
+    max_y = max(members_list, key=lambda pos:pos[1])[1]
+
+    half = int(floor(rows_and_columns/2))
+
+    x_offset = half - max_x
+    y_offset = half - max_y
+
+    table = [ [0 for _ in range(rows_and_columns)] for _ in range(rows_and_columns)]
+
+    for alive_cell in members_list:
+        x, y = alive_cell
+
+        x += x_offset
+        y += y_offset
+
+        table[x][y] = 1
+
+    tkinter_canvas = game_of_life(table, window_size, rows_and_columns)
+    tkinter_canvas.mainloop()
+
+
+if __name__ == "__main__":
+    main()

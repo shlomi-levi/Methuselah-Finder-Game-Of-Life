@@ -4,10 +4,17 @@ from Chromosome import Chromosome_Representation
 from typing import Callable
 from random import uniform
 from Roulette import Roulette
+import pickle
 
 INITIAL_CONFIGURATION_SQUARE_SIZE = 8
 
-def
+def update_result_file(result_file, data:frozenset[tuple[int,int]]):
+    with open(result_file, 'wb') as file:
+        pickle.dump(data, file)
+
+def update_average_evaluation_file(avg_eval_file, data:list[float]):
+    with open(avg_eval_file, 'wb') as file:
+        pickle.dump(data, file)
 
 class genetic_algorithm:
     alive_chance_in_initialization:float
@@ -56,7 +63,12 @@ class genetic_algorithm:
         return population
 
     def run(self, result_file:str, avg_evaluation_file:str):
+        average_evaluation_list = []
+
         population:list[Chromosome] = self.create_random_population() # Create random population
+
+        best_chromosome = population[0]
+        update_result_file(result_file, best_chromosome.representation.get())
 
         representation_to_chromosome:dict[Chromosome_Representation, Chromosome] = dict()
 
@@ -98,7 +110,17 @@ class genetic_algorithm:
 
             population = next_population
 
-            best_chromosome = max(population, key=lambda x: x.max_size)
+            temp = [self.evaluation_function(x) for x in population]
 
-            print(best_chromosome)
+            average_evaluation_list.append( sum(temp) / len(temp) ) # add average of current generation
+
+            update_average_evaluation_file(avg_evaluation_file, average_evaluation_list)
+
+            best_chromosome_current_iteration = max(population, key=lambda x: x.max_size)
+
+            print(best_chromosome_current_iteration)
+
+            if best_chromosome_current_iteration.max_size > best_chromosome.max_size:
+                best_chromosome = best_chromosome_current_iteration
+                update_result_file(result_file, best_chromosome.representation.get())
 

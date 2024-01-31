@@ -2,7 +2,6 @@ from genetic_algorithm import genetic_algorithm
 from Chromosome import Chromosome, Chromosome_Representation
 from math import ceil
 from random import uniform
-import GUI
 
 RESULT_FILE = 'result.data'
 AVG_EVALUATION_FILE = 'evaluation.data'
@@ -13,7 +12,7 @@ crossover_chance = 0.8
 population_size = 20
 initial_configuration_bounding_square = 10
 max_alive_on_start = 40
-border = 300
+border = 50
 
 def crossover_function(c1: Chromosome, c2: Chromosome, max_alive:int) -> Chromosome_Representation:
     c1_alive_members:list = c1.representation.get_members()
@@ -66,17 +65,6 @@ def main():
 
     g.run(RESULT_FILE, AVG_EVALUATION_FILE)
 
-    # rows_and_columns = 400
-    #
-    # table = [ [0 for _ in range(rows_and_columns)] for _ in range(rows_and_columns)]
-    #
-    # k = [(4, 0), (5, 4), (5, 1), (5, 7), (7, 4), (7, 1), (4, 5), (5, 0), (3, 6), (5, 3), (0, 4), (2, 1), (6, 1), (7, 0), (7, 6), (4, 1), (4, 4), (5, 5), (1, 1), (2, 6), (7, 5)]
-    #
-    # for t in k:
-    #     table [ t[0] ] [ t[1] ] = 1
-    #
-    # tkinter_canvas = GUI.game_of_life(table, 500, rows_and_columns)
-    # tkinter_canvas.mainloop()
 
 if __name__ == "__main__":
     main()
