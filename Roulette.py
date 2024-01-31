@@ -9,13 +9,14 @@ class Roulette:
     __participants__:list[Chromosome]
 
     def calculate_probabilities(self):
-        if self.__total_evaluation__ == 0:
+        if self.__participants__ and self.__total_evaluation__ == 0:
             raise ValueError("All chromosomes in current iteration have evaluation value of 0")
 
         last_probability = 0
         self.__probabilities_list__ = []
 
-        for c in self.__participants__:
+        for i in range(len(self.__participants__)):
+            c = self.__participants__[i]
             current_participant_probability = self.__evaluation_function__(c) / self.__total_evaluation__
 
             last_probability += current_participant_probability
@@ -49,9 +50,9 @@ class Roulette:
         return chosen_element
 
 
-    def __init__(self, participants:list[Chromosome], fitness_function):
+    def __init__(self, participants:list[Chromosome], eval_function):
         self.__participants__ = deepcopy(participants)
-        self.__evaluation_function__ = fitness_function
+        self.__evaluation_function__ = eval_function
 
         evaluation_list = [self.__evaluation_function__(x) for x in self.__participants__]
         self.__total_evaluation__ = sum(evaluation_list)

@@ -7,62 +7,48 @@ class INFINITY_TABLE(Enum):
     YES = 2
 
 class Chromosome_Representation:
-    representation:set[tuple[int,int]]
-    hash_string:str
+    alive_members:frozenset[tuple[int,int]]
     def get(self):
-        return self.representation
+        return self.alive_members
 
     def get_members(self):
         members = []
-        for alive_location in self.representation:
+        for alive_location in self.alive_members:
             members.append(alive_location)
 
         return members
 
-    def __init__(self, representation:set[tuple[int, int]]):
-        self.representation = representation
-        self.hash_string = self.get_hash_string()
-
-    def get_hash_string(self):
-        ret = ''
-
-        members = self.get_members()
-
-        members.sort(key=lambda x:x[0])
-
-        for alive_location in members:
-            ret += str(alive_location[0]) + str(alive_location[1])
-
-        return ret
+    def __init__(self, alive_members:set[tuple[int, int]]):
+        self.alive_members = frozenset(alive_members)
 
     def __hash__(self):
-        return self.hash_string.__hash__()
+        return hash(self.alive_members)
     def __eq__(self, other):
         if not isinstance(other, Chromosome_Representation):
             return False
 
-        for member in self.representation:
-            if member not in other.representation:
+        for member in self.alive_members:
+            if member not in other.alive_members:
                 return False
 
-        for member in other.representation:
-            if member not in self.representation:
+        for member in other.alive_members:
+            if member not in self.alive_members:
                 return False
 
         return True
 
     @staticmethod
     def create_random_representation(bounding_square:int, alive_chance:float):
-        representation: set[tuple[int, int]] = set()
+        alive_members: set[tuple[int, int]] = set()
 
-        while not representation:
+        while not alive_members:
             for i in range(bounding_square):
                 for j in range(bounding_square):
                     r = uniform(0, 1)
                     if r <= alive_chance:
-                        representation.add((i, j))
+                        alive_members.add((i, j))
 
-        return Chromosome_Representation(representation)
+        return Chromosome_Representation(alive_members)
 
 class Chromosome:
     representation:Chromosome_Representation
@@ -86,7 +72,7 @@ class Chromosome:
         if not isinstance(other, Chromosome):
             return False
 
-        return self.representation.__eq__(other)
+        return self.representation.__eq__(other.representation)
 
-
-
+    def __str__(self):
+        return f"Initial size: {self.initial_size} Lifespan: {self.lifespan} Max Size: {self.max_size} {self.representation.get()}"
