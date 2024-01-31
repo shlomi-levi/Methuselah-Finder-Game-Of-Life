@@ -4,7 +4,8 @@ from math import ceil
 from random import uniform
 import GUI
 
-FILE_NAME = 'results.data'
+RESULT_FILE = 'result.data'
+AVG_EVALUATION_FILE = 'evaluation.data'
 
 alive_chance_in_initialization = 0.15
 mutation_chance = 0.15
@@ -12,7 +13,7 @@ crossover_chance = 0.8
 population_size = 20
 initial_configuration_bounding_square = 10
 max_alive_on_start = 40
-border = 200
+border = 300
 
 def crossover_function(c1: Chromosome, c2: Chromosome, max_alive:int) -> Chromosome_Representation:
     c1_alive_members:list = c1.representation.get_members()
@@ -63,7 +64,7 @@ def main():
     g = genetic_algorithm(alive_chance_in_initialization, mutation_chance, mutate, crossover_chance,
                           crossover_function, population_size, evaluation_function, initial_configuration_bounding_square, border, max_alive_on_start)
 
-    g.run("b")
+    g.run(RESULT_FILE, AVG_EVALUATION_FILE)
 
     # rows_and_columns = 400
     #

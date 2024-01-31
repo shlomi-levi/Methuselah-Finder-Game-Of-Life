@@ -7,6 +7,8 @@ from Roulette import Roulette
 
 INITIAL_CONFIGURATION_SQUARE_SIZE = 8
 
+def
+
 class genetic_algorithm:
     alive_chance_in_initialization:float
     mutation_chance:float
@@ -53,7 +55,7 @@ class genetic_algorithm:
 
         return population
 
-    def run(self, file_name:str):
+    def run(self, result_file:str, avg_evaluation_file:str):
         population:list[Chromosome] = self.create_random_population() # Create random population
 
         representation_to_chromosome:dict[Chromosome_Representation, Chromosome] = dict()
