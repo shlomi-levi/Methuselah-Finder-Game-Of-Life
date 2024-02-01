@@ -1,2 +1,1 @@
-
-SAVE_FILE_NAME = 'visuals/data.pckl'
+SAVE_FILE_NAME = 'data.pckl'

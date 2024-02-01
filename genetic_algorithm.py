@@ -4,10 +4,10 @@ from Chromosome import Chromosome_Representation
 from typing import Callable
 from random import uniform
 from Roulette import Roulette
-from visuals.ResultsFormat import Result
+from ResultsFormat import Result
 import pickle
-
 from constants import SAVE_FILE_NAME
+
 
 class genetic_algorithm:
     alive_probability_in_initialization:float
