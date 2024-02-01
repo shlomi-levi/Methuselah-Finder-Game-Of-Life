@@ -7,7 +7,8 @@ and edited it to fit my needs
 import tkinter as tk
 import pickle
 from tkinter import Canvas
-from genetic_algorithm_run_example import RESULT_FILE
+from constants import SAVE_FILE_NAME
+from ResultsFormat import Result
 
 class game_of_life(tk.Tk):
 
@@ -119,14 +120,20 @@ class game_of_life(tk.Tk):
         return count
 
 def main():
-    members:frozenset
+    data:Result
+
+    # Load data from the last time we ran the genetic algorithm
+    try:
+        with open(SAVE_FILE_NAME, 'rb') as file:
+            data = pickle.load(file)
+
+    except:
+        raise FileNotFoundError("Data file not found")
+
+    members:frozenset = data.best_chromosome_found.representation.get()
 
     window_size = 800
-    grid_edges = (50, 50)
-
-    # Load the best result we got the last time we ran our genetic algorithm
-    with open(RESULT_FILE, 'rb') as file:
-        members = pickle.load(file)
+    grid_edges = data.grid_edges
 
     table = [ [0 for _ in range(grid_edges[0])] for _ in range(grid_edges[1])] # Create the table representing the cells
 

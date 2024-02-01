@@ -43,7 +43,7 @@ class Chromosome_Representation:
         alive_members: set[tuple[int, int]] = set()
         alive_members_count = 0
 
-        # I don't want the living members to not be at the edges of the grid
+        # I don't want the living members to appear at the edges of the grid
         first_x = int(ceil(0.25 * grid_edges[0]))
         last_x = int(floor(0.75 * grid_edges[0]))
 

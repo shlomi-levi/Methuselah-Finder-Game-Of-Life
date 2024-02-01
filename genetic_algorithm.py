@@ -4,17 +4,10 @@ from Chromosome import Chromosome_Representation
 from typing import Callable
 from random import uniform
 from Roulette import Roulette
+from visuals.ResultsFormat import Result
 import pickle
 
-# Updates the result file with the best result found yet
-def update_result_file(result_file, data:list[frozenset[tuple[int,int]]]):
-    with open(result_file, 'wb') as file:
-        pickle.dump(data, file)
-
-# Updates the average evaluation file with the current average evaluation array
-def update_average_evaluation_file(avg_eval_file, data:list[float]):
-    with open(avg_eval_file, 'wb') as file:
-        pickle.dump(data, file)
+from constants import SAVE_FILE_NAME
 
 class genetic_algorithm:
     alive_probability_in_initialization:float
@@ -61,13 +54,13 @@ class genetic_algorithm:
 
         return population
 
-    def run(self, result_file:str, avg_evaluation_file:str):
-        average_evaluation_list = []
+    def run(self):
 
         population:list[Chromosome] = self.create_random_population() # Create random population
 
         best_chromosome = population[0]
-        update_result_file(result_file, best_chromosome.representation.get())
+        best_chromosome_by_generation = []
+        evaluation_list_by_generation = []
 
         representation_to_chromosome:dict[Chromosome_Representation, Chromosome] = dict()
 
@@ -112,17 +105,19 @@ class genetic_algorithm:
 
             population = next_population
 
-            temp = [self.evaluation_function(x) for x in population]
+            # Data related stuff
+            best_chromosome_by_generation.append(max(population, key=lambda x: self.evaluation_function(x)))
+            
+            if self.evaluation_function(best_chromosome_by_generation[-1]) > self.evaluation_function(best_chromosome):
+                best_chromosome = best_chromosome_by_generation[-1]
+                
+            current_generation_evaluation = [self.evaluation_function(x) for x in population]
+            evaluation_list_by_generation.append(current_generation_evaluation)
+            #   #   #
 
-            average_evaluation_list.append( sum(temp) / len(temp) ) # add average of current generation
+            print("Ended iteration number", i + 1, "/", self.num_of_generations, "of genetic algorithm")
 
-            update_average_evaluation_file(avg_evaluation_file, average_evaluation_list)
+        res = Result(self.grid_edges, best_chromosome, best_chromosome_by_generation, evaluation_list_by_generation)
 
-            best_chromosome_current_iteration = max(population, key=lambda x: x.max_size)
-
-            print(best_chromosome_current_iteration)
-
-            if best_chromosome_current_iteration.max_size > best_chromosome.max_size:
-                best_chromosome = best_chromosome_current_iteration
-                update_result_file(result_file, best_chromosome.representation.get())
-
+        with open(SAVE_FILE_NAME, 'wb') as file:
+            pickle.dump(res, file)

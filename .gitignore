@@ -1,5 +1,5 @@
 .idea/
 venv/
 __pycache__/
-result.data
-evaluation.data
+*.pckl
+visuals/*.pckl
