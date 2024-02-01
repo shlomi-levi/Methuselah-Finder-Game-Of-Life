@@ -1,5 +1,6 @@
 from enum import Enum
 from random import uniform
+from math import floor, ceil
 
 class INFINITY_TABLE(Enum):
     UNKNOWN = 0
@@ -38,15 +39,28 @@ class Chromosome_Representation:
         return True
 
     @staticmethod
-    def create_random_representation(bounding_square:int, alive_chance:float):
+    def create_random_representation(grid_edges:tuple[int, int], alive_chance:float, max_alive:int):
         alive_members: set[tuple[int, int]] = set()
+        alive_members_count = 0
+
+        # I don't want the living members to not be at the edges of the grid
+        first_x = int(ceil(0.25 * grid_edges[0]))
+        last_x = int(floor(0.75 * grid_edges[0]))
+
+        first_y = int(ceil(0.25 * grid_edges[1]))
+        last_y = int(floor(0.75 * grid_edges[1]))
+        # # #
 
         while not alive_members:
-            for i in range(bounding_square):
-                for j in range(bounding_square):
+            for coor_x in range(first_x, last_x):
+                for coor_y in range(first_y, last_y):
                     r = uniform(0, 1)
                     if r <= alive_chance:
-                        alive_members.add((i, j))
+                        alive_members.add((coor_x, coor_y))
+                        alive_members_count += 1
+
+                        if alive_members_count >= max_alive:
+                            return Chromosome_Representation(alive_members)
 
         return Chromosome_Representation(alive_members)
 

@@ -6,10 +6,8 @@ from random import uniform
 from Roulette import Roulette
 import pickle
 
-INITIAL_CONFIGURATION_SQUARE_SIZE = 8
-
 # Updates the result file with the best result found yet
-def update_result_file(result_file, data:frozenset[tuple[int,int]]):
+def update_result_file(result_file, data:list[frozenset[tuple[int,int]]]):
     with open(result_file, 'wb') as file:
         pickle.dump(data, file)
 
@@ -19,46 +17,45 @@ def update_average_evaluation_file(avg_eval_file, data:list[float]):
         pickle.dump(data, file)
 
 class genetic_algorithm:
-    alive_chance_in_initialization:float
-    mutation_chance:float
-    mutation_function:Callable[[Chromosome_Representation, float, int], Chromosome_Representation]
-    crossover_chance:float
-    crossover_function: Callable[[Chromosome, Chromosome, int], Chromosome_Representation]
+    alive_probability_in_initialization:float
+    mutation_probability:float
+    mutation_function:Callable[[Chromosome_Representation], Chromosome_Representation]
+    crossover_probability:float
+    crossover_function: Callable[[Chromosome, Chromosome], Chromosome_Representation]
     population_size:int
     num_of_generations:int
     evaluation_function:Callable[[Chromosome], float]
-    initial_configuration_bounding_square:int
     max_alive_on_start:int
-    border:int
+    grid_edges:tuple[int, int]
 
-    def __init__(self, alive_chance_in_initialization, mutation_chance, mutation_function, crossover_chance, crossover_function, population_size, evaluation_function, initial_config_bounding_sq, border, max_alive_on_start):
+    def __init__(self, alive_probability_in_initialization, mutation_probability, mutation_function, crossover_probability, crossover_function, population_size, evaluation_function, grid_edges, max_alive_on_random_population, num_of_generations):
 
         if population_size < 2:
             raise ValueError("Population size must be at least 2.")
 
-        self.alive_chance_in_initialization = alive_chance_in_initialization
-        self.mutation_chance = mutation_chance
+        self.alive_probability_in_initialization = alive_probability_in_initialization
+        self.mutation_probability = mutation_probability
         self.mutation_function = mutation_function
-        self.crossover_chance = crossover_chance
+        self.crossover_probability = crossover_probability
         self.crossover_function = crossover_function
         self.population_size = population_size
         self.evaluation_function = evaluation_function
-        self.initial_configuration_bounding_square = initial_config_bounding_sq
-        self.border = border
-        self.max_alive_on_start = max_alive_on_start
+        self.grid_edges = grid_edges
+        self.max_alive_on_random_population = max_alive_on_random_population
+        self.num_of_generations = num_of_generations
 
     def create_random_population(self) -> list[Chromosome]:
         population = []
         s = set()
 
         for i in range(self.population_size):
-            random_representation = Chromosome_Representation.create_random_representation(INITIAL_CONFIGURATION_SQUARE_SIZE, self.alive_chance_in_initialization)
+            random_representation = Chromosome_Representation.create_random_representation(self.grid_edges, self.alive_probability_in_initialization, self.max_alive_on_random_population)
 
             while random_representation in s:
-                random_representation = Chromosome_Representation.create_random_representation(INITIAL_CONFIGURATION_SQUARE_SIZE, self.alive_chance_in_initialization)
+                random_representation = Chromosome_Representation.create_random_representation(self.grid_edges, self.alive_probability_in_initialization, self.max_alive_on_random_population)
 
             s.add(random_representation)
-            c:Chromosome = GameOfLife.simulate(random_representation, self.border)
+            c:Chromosome = GameOfLife.simulate(random_representation, self.grid_edges)
 
             population.append(c)
 
@@ -74,7 +71,7 @@ class genetic_algorithm:
 
         representation_to_chromosome:dict[Chromosome_Representation, Chromosome] = dict()
 
-        while True: # Iteration of the genetic algorithm
+        for i in range(self.num_of_generations):
             r:Roulette = Roulette(population, self.evaluation_function)
             next_population = []
 
@@ -86,9 +83,9 @@ class genetic_algorithm:
                 parent1:Chromosome = r.get()
                 parent2:Chromosome = r.get()
 
-                crossover_chance = uniform(0, 1)
+                crossover_probability = uniform(0, 1)
 
-                if crossover_chance > self.crossover_chance: # If we don't need to crossover and mutate
+                if crossover_probability > self.crossover_probability: # If we don't need to crossover and mutate
                     next_population.append(parent1)
 
                     if len(next_population) == self.population_size:
@@ -97,15 +94,18 @@ class genetic_algorithm:
                     next_population.append(parent2)
                     continue
 
-                crossover_representation = self.crossover_function(parent1, parent2, self.max_alive_on_start)
+                offspring_representation = self.crossover_function(parent1, parent2)
 
-                offspring_representation = self.mutation_function(crossover_representation, self.mutation_chance, self.initial_configuration_bounding_square)
+                mutation_probability = uniform(0, 1)
+
+                if mutation_probability <= self.mutation_probability:
+                    offspring_representation = self.mutation_function(offspring_representation)
 
                 if offspring_representation in representation_to_chromosome:
                     offspring:Chromosome = representation_to_chromosome[offspring_representation]
 
                 else:
-                    offspring:Chromosome = GameOfLife.simulate(offspring_representation, self.border)
+                    offspring:Chromosome = GameOfLife.simulate(offspring_representation, self.grid_edges)
                     representation_to_chromosome[offspring_representation] = offspring
 
                 next_population.append(offspring)

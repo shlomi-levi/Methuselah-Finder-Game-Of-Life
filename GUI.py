@@ -6,9 +6,8 @@ and edited it to fit my needs
 
 import tkinter as tk
 import pickle
-from math import floor
 from tkinter import Canvas
-from main import RESULT_FILE
+from genetic_algorithm_run_example import RESULT_FILE
 
 class game_of_life(tk.Tk):
 
@@ -35,11 +34,6 @@ class game_of_life(tk.Tk):
         # Set up an empty game grid.
         self.grid = table
 
-        # Fill the game grid with random data.
-        # for x in range(0, self.resolution):
-        #     for y in range(0, self.resolution):
-        #         self.grid[x][y] = random.randint(0, 1)
-
                 # Genearte the game board.
         self.generate_board()
 
@@ -60,14 +54,16 @@ class game_of_life(tk.Tk):
         # Draw a square on the game board for every live cell in the grid.
         for x in range(0, self.resolution):
             for y in range(0, self.resolution):
+                if not self.grid[x][y]:
+                    continue
+
                 realx = x * self.size_factor
                 realy = y * self.size_factor
-                if self.grid[x][y] == 1:
-                    self.draw_square(realx, realy, self.size_factor)
+                self.draw_square(realx, realy, self.size_factor)
 
     def draw_square(self, y, x, size):
         # Draw a square on the canvas.
-        self.canvas.create_rectangle(x, y, x + size, y + size, fill='black', outline='black')
+        self.canvas.create_rectangle(x, y, x + size, y + size, fill='orange', outline='black')
 
     def run_generation(self):
         # Generate new empty grid to populate with result of generation.
@@ -109,6 +105,8 @@ class game_of_life(tk.Tk):
 
         for x1 in xrange:
             for y1 in yrange:
+                if x1 < 0 or y1 < 0: # We don't want it to be cyclic.
+                    continue
                 if x1 == x and y1 == y:
                     # Don't count this cell.
                     continue
@@ -123,30 +121,16 @@ def main():
     members:frozenset
 
     window_size = 800
-    rows_and_columns = 100
+    rows_and_columns = 50
 
     # Load the best result we got the last time we ran our genetic algorithm
     with open(RESULT_FILE, 'rb') as file:
         members = pickle.load(file)
 
-    # Center the living cells in the middle of the board
-    members_list = list(members)
-
-    max_x = max(members_list, key=lambda pos:pos[0])[0]
-    max_y = max(members_list, key=lambda pos:pos[1])[1]
-
-    half = int(floor(rows_and_columns/2))
-
-    x_offset = half - max_x # Offset for x values
-    y_offset = half - max_y # Offset for y values
-
     table = [ [0 for _ in range(rows_and_columns)] for _ in range(rows_and_columns)] # Create the table representing the cells
 
-    for alive_cell in members_list: # Add living cells, with the appropriate offsets to each coordinate
+    for alive_cell in members: # Add living cells, with the appropriate offsets to each coordinate
         x, y = alive_cell
-
-        x += x_offset
-        y += y_offset
 
         table[x][y] = 1
 
