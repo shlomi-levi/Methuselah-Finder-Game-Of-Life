@@ -70,6 +70,7 @@ class Chromosome:
     initial_size:int
     max_size:int
     is_infinite:INFINITY_TABLE
+    evaluation_value:float
 
     def __init__(self, representation:Chromosome_Representation, lifespan:int, initial_size:int, max_size:int, is_infinite:INFINITY_TABLE):
         self.representation = representation
@@ -77,6 +78,10 @@ class Chromosome:
         self.initial_size = initial_size
         self.max_size = max_size
         self.is_infinite = is_infinite
+        self.evaluation_value = 0.0
+
+    def set_evaluation_value(self, val):
+        self.evaluation_value = val
 
     def __hash__(self):
         return self.representation.__hash__()

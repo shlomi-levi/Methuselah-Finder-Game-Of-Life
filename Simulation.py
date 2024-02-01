@@ -127,8 +127,9 @@ def main():
         with open(SAVE_FILE_NAME, 'rb') as file:
             data = pickle.load(file)
 
-    except:
-        raise FileNotFoundError("Data file not found")
+    except Exception as error:
+        print(error)
+        exit()
 
     members:frozenset = data.best_chromosome_found.representation.get()
 

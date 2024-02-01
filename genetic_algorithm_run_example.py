@@ -66,8 +66,8 @@ def evaluation_function(c:Chromosome) -> float:
     if c.initial_size == 0:
         return 0
 
-    # return ( (1/c.initial_size) * 0.7) + (c.max_size * 0.35) + (c.lifespan * 0.4)
-    return c.max_size / c.initial_size
+    return ( (1/c.initial_size) * 0.7) + (c.max_size * 0.5) + (c.lifespan * 0.4)
+    # return c.max_size / c.initial_size
 
 def start():
     g = genetic_algorithm(alive_probability_in_initialization, mutation_probability, mutate, crossover_probability,

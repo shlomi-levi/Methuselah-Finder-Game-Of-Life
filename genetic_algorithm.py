@@ -8,7 +8,6 @@ from ResultsFormat import Result
 import pickle
 from constants import SAVE_FILE_NAME
 
-
 class genetic_algorithm:
     alive_probability_in_initialization:float
     mutation_probability:float
@@ -48,7 +47,7 @@ class genetic_algorithm:
                 random_representation = Chromosome_Representation.create_random_representation(self.grid_edges, self.alive_probability_in_initialization, self.max_alive_on_random_population)
 
             s.add(random_representation)
-            c:Chromosome = GameOfLife.simulate(random_representation, self.grid_edges)
+            c:Chromosome = GameOfLife.simulate(random_representation, self.grid_edges, self.evaluation_function)
 
             population.append(c)
 
@@ -98,7 +97,7 @@ class genetic_algorithm:
                     offspring:Chromosome = representation_to_chromosome[offspring_representation]
 
                 else:
-                    offspring:Chromosome = GameOfLife.simulate(offspring_representation, self.grid_edges)
+                    offspring:Chromosome = GameOfLife.simulate(offspring_representation, self.grid_edges, self.evaluation_function)
                     representation_to_chromosome[offspring_representation] = offspring
 
                 next_population.append(offspring)
@@ -117,7 +116,13 @@ class genetic_algorithm:
 
             print("Ended iteration number", i + 1, "/", self.num_of_generations, "of genetic algorithm")
 
-        res = Result(self.grid_edges, best_chromosome, best_chromosome_by_generation, evaluation_list_by_generation)
+        res = Result(self.grid_edges, best_chromosome, best_chromosome_by_generation, evaluation_list_by_generation, self.num_of_generations)
 
-        with open(SAVE_FILE_NAME, 'wb') as file:
-            pickle.dump(res, file)
+        try:
+            with open(SAVE_FILE_NAME, 'wb') as file:
+                pickle.dump(res, file)
+
+        except Exception as e:
+            print(e)
+
+        print("Best chromosome found: ", best_chromosome)

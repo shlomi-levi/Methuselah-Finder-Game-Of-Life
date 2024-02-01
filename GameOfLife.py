@@ -1,4 +1,5 @@
 from Chromosome import Chromosome, INFINITY_TABLE, Chromosome_Representation
+from typing import Callable
 
 # Counts and returns the number of neighbors that are alive, relative to the cell in (row, col)
 def count_alive_neighbors(alive_dict:set[tuple[int,int]], row:int, col:int, grid_edges:tuple[int, int]) -> int:
@@ -42,7 +43,7 @@ def get_dead_neighbors(alive_set, row:int, col:int, grid_edges:tuple[int, int]) 
 
 # Simulates the game of life for a starting configuration.
 # Returns a chromosome instance
-def simulate(start:Chromosome_Representation, grid_edges:tuple[int, int]) -> Chromosome:
+def simulate(start:Chromosome_Representation, grid_edges:tuple[int, int], evaluation_function:Callable[[Chromosome], float]) -> Chromosome:
     representation = start.get() # Get the frozen set that consists of living cells
 
     if not representation: # If there are no living cells
@@ -97,5 +98,7 @@ def simulate(start:Chromosome_Representation, grid_edges:tuple[int, int]) -> Chr
     else:
         is_infinite = INFINITY_TABLE.NO
 
-    return Chromosome(start, lifespan, initial_size, max_size, is_infinite)
+    c = Chromosome(start, lifespan, initial_size, max_size, is_infinite)
+    c.set_evaluation_value(evaluation_function(c))
+    return c
 
