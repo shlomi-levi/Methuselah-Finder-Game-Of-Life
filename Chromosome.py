@@ -1,11 +1,5 @@
-from enum import Enum
 from random import uniform
 from math import floor, ceil
-
-class INFINITY_TABLE(Enum):
-    UNKNOWN = 0
-    NO = 1
-    YES = 2
 
 class Chromosome_Representation:
     alive_members:frozenset[tuple[int,int]]
@@ -69,15 +63,13 @@ class Chromosome:
     lifespan:int
     initial_size:int
     max_size:int
-    is_infinite:INFINITY_TABLE
     evaluation_value:float
 
-    def __init__(self, representation:Chromosome_Representation, lifespan:int, initial_size:int, max_size:int, is_infinite:INFINITY_TABLE):
+    def __init__(self, representation:Chromosome_Representation, lifespan:int, initial_size:int, max_size:int):
         self.representation = representation
         self.lifespan = lifespan
         self.initial_size = initial_size
         self.max_size = max_size
-        self.is_infinite = is_infinite
         self.evaluation_value = 0.0
 
     def set_evaluation_value(self, val):

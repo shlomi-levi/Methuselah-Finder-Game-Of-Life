@@ -6,7 +6,7 @@ from random import uniform
 alive_probability_in_initialization = 0.15
 mutation_probability = 1.0
 crossover_probability = 0.8
-population_size = 20
+population_size = 50
 max_alive_on_start = 32
 num_of_generations = 20
 grid_edges = (50, 50)
@@ -66,8 +66,9 @@ def evaluation_function(c:Chromosome) -> float:
     if c.initial_size == 0:
         return 0
 
-    return ( (1/c.initial_size) * 0.7) + (c.max_size * 0.5) + (c.lifespan * 0.4)
-    # return c.max_size / c.initial_size
+    # return 6/c.initial_size + (c.max_size * 8) + (c.lifespan * 6)
+    # return c.max_size
+    return c.max_size / c.initial_size
 
 def start():
     g = genetic_algorithm(alive_probability_in_initialization, mutation_probability, mutate, crossover_probability,

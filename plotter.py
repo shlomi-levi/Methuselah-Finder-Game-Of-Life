@@ -52,8 +52,8 @@ def main():
         exit()
 
     # plot_best_fitness_by_generation(data)
-    plot_all_chromosomes_fitness(data)
-    # plot_avg_fitness_by_generation(data)
+    # plot_all_chromosomes_fitness(data)
+    plot_avg_fitness_by_generation(data)
 
 
 if __name__ == '__main__':
