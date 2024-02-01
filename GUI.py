@@ -11,7 +11,7 @@ from genetic_algorithm_run_example import RESULT_FILE
 
 class game_of_life(tk.Tk):
 
-    def __init__(self, table:list[list[int]], width_and_height=800, resolution=100):
+    def __init__(self, table:list[list[int]], width_and_height=800, resolution=(100,100)):
         super().__init__()
 
         self.title("Game of life")
@@ -22,7 +22,8 @@ class game_of_life(tk.Tk):
         # Set the height and width of the applciation.
         self.width_and_height = width_and_height
         self.resolution = resolution
-        self.size_factor = self.width_and_height / self.resolution
+        self.size_factor_x = self.width_and_height / self.resolution[0]
+        self.size_factor_y = self.width_and_height / self.resolution[1]
 
         # Set up the size of the canvas.
         self.geometry(str(self.width_and_height) + "x" + str(self.width_and_height))
@@ -52,26 +53,26 @@ class game_of_life(tk.Tk):
 
     def generate_board(self):
         # Draw a square on the game board for every live cell in the grid.
-        for x in range(0, self.resolution):
-            for y in range(0, self.resolution):
+        for x in range(0, self.resolution[0]):
+            for y in range(0, self.resolution[1]):
                 if not self.grid[x][y]:
                     continue
 
-                realx = x * self.size_factor
-                realy = y * self.size_factor
-                self.draw_square(realx, realy, self.size_factor)
+                realx = x * self.size_factor_x
+                realy = y * self.size_factor_y
+                self.draw_square(realx, realy, self.size_factor_x, self.size_factor_y)
 
-    def draw_square(self, y, x, size):
+    def draw_square(self, y, x, size_x, size_y):
         # Draw a square on the canvas.
-        self.canvas.create_rectangle(x, y, x + size, y + size, fill='orange', outline='black')
+        self.canvas.create_rectangle(x, y, x + size_x, y + size_y, fill='orange', outline='black')
 
     def run_generation(self):
         # Generate new empty grid to populate with result of generation.
-        return_grid = [[0 for _ in range(self.resolution)] for _ in range(self.resolution)]
+        return_grid = [[0 for _ in range(self.resolution[0])] for _ in range(self.resolution[1])]
 
         # Iterate over the grid.
-        for x in range(0, self.resolution):
-            for y in range(0, self.resolution):
+        for x in range(0, self.resolution[0]):
+            for y in range(0, self.resolution[1]):
                 neighbours = self.number_neighbours(x, y)
                 if self.grid[x][y] == 1:
                     # Current cell is alive.
@@ -121,20 +122,20 @@ def main():
     members:frozenset
 
     window_size = 800
-    rows_and_columns = 50
+    grid_edges = (50, 50)
 
     # Load the best result we got the last time we ran our genetic algorithm
     with open(RESULT_FILE, 'rb') as file:
         members = pickle.load(file)
 
-    table = [ [0 for _ in range(rows_and_columns)] for _ in range(rows_and_columns)] # Create the table representing the cells
+    table = [ [0 for _ in range(grid_edges[0])] for _ in range(grid_edges[1])] # Create the table representing the cells
 
     for alive_cell in members: # Add living cells, with the appropriate offsets to each coordinate
         x, y = alive_cell
 
         table[x][y] = 1
 
-    tkinter_canvas = game_of_life(table, window_size, rows_and_columns)
+    tkinter_canvas = game_of_life(table, window_size, grid_edges)
     tkinter_canvas.mainloop()
 
 
