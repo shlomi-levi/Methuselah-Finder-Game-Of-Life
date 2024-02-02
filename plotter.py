@@ -6,6 +6,7 @@ from ResultsFormat import Result
 def plot_best_fitness_by_generation(r:Result):
     dots = [(i + 1, chromosome.evaluation_value) for i, chromosome in enumerate(r.best_by_generation)]
 
+
     plot('Best Fitness Over Generations Of The Genetic Algorithm', 'Generation', 'Fitness', dots)
 
 def plot_all_chromosomes_fitness(r:Result):
@@ -53,7 +54,7 @@ def main():
 
     # plot_best_fitness_by_generation(data)
     # plot_all_chromosomes_fitness(data)
-    plot_avg_fitness_by_generation(data)
+    # plot_avg_fitness_by_generation(data)
 
 
 if __name__ == '__main__':

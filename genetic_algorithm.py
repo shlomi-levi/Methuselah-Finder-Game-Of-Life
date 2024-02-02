@@ -105,10 +105,12 @@ class genetic_algorithm:
             population = next_population
 
             # Data related stuff
-            best_chromosome_by_generation.append(max(population, key=lambda x:x.evaluation_value))
+            best_chromosome_current_generation = max(population, key=lambda c: c.evaluation_value)
+
+            best_chromosome_by_generation.append(best_chromosome_current_generation)
             
-            if best_chromosome_by_generation[-1].evaluation_value > best_chromosome.evaluation_value:
-                best_chromosome = best_chromosome_by_generation[-1]
+            if best_chromosome_current_generation.evaluation_value > best_chromosome.evaluation_value:
+                best_chromosome = best_chromosome_current_generation
                 
             current_generation_evaluation = [x.evaluation_value for x in population]
             evaluation_list_by_generation.append(current_generation_evaluation)

@@ -33,7 +33,7 @@ class Chromosome_Representation:
         return True
 
     @staticmethod
-    def create_random_representation(grid_edges:tuple[int, int], alive_chance:float, max_alive:int):
+    def create_random_representation(grid_edges:tuple[int, int], alive_probability:float, max_alive:int):
         alive_members: set[tuple[int, int]] = set()
         alive_members_count = 0
 
@@ -49,7 +49,7 @@ class Chromosome_Representation:
             for coor_x in range(first_x, last_x):
                 for coor_y in range(first_y, last_y):
                     r = uniform(0, 1)
-                    if r <= alive_chance:
+                    if r <= alive_probability:
                         alive_members.add((coor_x, coor_y))
                         alive_members_count += 1
 
